@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobilabonnement og Produkt Beregner</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+</head>
+<link rel="stylesheet" href="styles.css">
+<body class="bg-gray-100 p-8">
+    <div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl p-6">
+        <h1 class="text-2xl font-bold mb-4">Mobilabonnement og Produkt Beregner</h1>
+        <div class="mb-4">
+            <label for="currentPrice" class="block text-sm font-medium text-gray-700">Nuværende månedlig abonnementspris:</label>
+            <input type="number" id="currentPrice" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+        </div>
+        <div class="mb-4">
+            <label for="productPrice" class="block text-sm font-medium text-gray-700">Pris på produkt:</label>
+            <input type="number" id="productPrice" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+        </div>
+        <button onclick="calculate()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Beregn</button>
+        <div id="result" class="mt-4"></div>
+    </div>
+
+    <script>
+        const subscriptions = [
+            { name: "CBB 40 GB", price: 109, discount: 100 },
+            { name: "CBB 100 GB", price: 129, discount: 250 },
+            { name: "CBB 300 GB", price: 149, discount: 300 },
+            { name: "Telenor 25 GB", price: 159, discount: 300 },
+            { name: "Telenor 50 GB", price: 189, discount: 450 },
+            { name: "Telenor 100 GB", price: 229, discount: 650 },
+            { name: "Telenor fri data", price: 279, discount: 800 },
+            { name: "YouSee 20 GB", price: 149, discount: 300 },
+            { name: "YouSee 40 GB", price: 179, discount: 450 },
+            { name: "YouSee 80 GB", price: 219, discount: 600 },
+            { name: "YouSee fri data", price: 279, discount: 1000 }
+        ];
+
+        function calculate() {
+            const currentPrice = parseFloat(document.getElementById('currentPrice').value);
+            const productPrice = parseFloat(document.getElementById('productPrice').value);
+
+            if (isNaN(currentPrice) || isNaN(productPrice)) {
+                alert("Indtast venligst gyldige tal for både abonnement og produktpris.");
+                return;
+            }
+
+            let bestSubscription = null;
+            let bestSavings = 0;
+
+            for (const sub of subscriptions) {
+                const savings = (currentPrice - sub.price) * 6 + sub.discount;
+                if (savings > bestSavings) {
+                    bestSavings = savings;
+                    bestSubscription = sub;
+                }
+            }
+
+            if (bestSubscription) {
+                const newProductPrice = productPrice - bestSubscription.discount;
+                const totalCost = newProductPrice + bestSubscription.price * 6;
+                const oldTotalCost = productPrice + currentPrice * 6;
+
+                const resultHTML = `
+                    <h2 class="text-xl font-semibold mt-4 mb-2">Resultat:</h2>
+                    <p>Bedste abonnement: ${bestSubscription.name}</p>
+                    <p>Månedlig abonnementspris: ${bestSubscription.price} kr</p>
+                    <p>Ny produktpris: ${newProductPrice} kr</p>
+                    <p>Total pris efter 6 måneder: ${totalCost} kr</p>
+                    <p class="font-semibold">Total pris uden at skifte abonnement: ${oldTotalCost} kr</p>
+                    <p>Besparelse i forhold til nuværende situation: ${oldTotalCost - totalCost} kr</p>
+                `;
+                document.getElementById('result').innerHTML = resultHTML;
+            } else {
+                document.getElementById('result').innerHTML = "<p>Ingen passende abonnementer fundet.</p>";
+            }
+        }
+    </script>
+</body>
+</html>
